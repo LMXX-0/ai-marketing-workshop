@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 出海营销工坊</title>
+<style>
+:root{
+  --bg:#f4f6fa; --card:#fff; --text:#1f2733; --sub:#6b7686; --line:#e4e8ef;
+  --primary:#2f6fed; --primary-soft:#e8f0ff; --ok:#2e9e5b; --ok-soft:#e5f6ec;
+  --warn:#d98a1c; --warn-soft:#fff3df; --err:#d6423e; --err-soft:#fdeceb;
+  --code:#f1f3f7; --shadow:0 1px 3px rgba(20,30,50,.08);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161d; --card:#1b212b; --text:#e6e9ef; --sub:#98a3b3; --line:#2b3340;
+    --primary:#5b93ff; --primary-soft:#1e2c47; --ok:#4cc47f; --ok-soft:#173226;
+    --warn:#f0a93e; --warn-soft:#3a2c14; --err:#ef6b67; --err-soft:#3b1d1c; --code:#232a36; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161d; --card:#1b212b; --text:#e6e9ef; --sub:#98a3b3; --line:#2b3340;
+  --primary:#5b93ff; --primary-soft:#1e2c47; --ok:#4cc47f; --ok-soft:#173226;
+  --warn:#f0a93e; --warn-soft:#3a2c14; --err:#ef6b67; --err-soft:#3b1d1c; --code:#232a36; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar-in{max-width:1220px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;padding:12px 0}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2f6fed,#7a5cf0);display:grid;place-items:center;color:#fff;font-size:16px}
+.tabs{display:flex;gap:4px;flex:1;overflow-x:auto}
+.tab{border:0;background:none;padding:16px 14px;cursor:pointer;color:var(--sub);border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.top-right{display:flex;align-items:center;gap:10px}
+.badge{font-size:12px;padding:2px 10px;border-radius:99px;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+.icon-btn{border:1px solid var(--line);background:var(--card);border-radius:8px;width:32px;height:32px;cursor:pointer}
+main{max-width:1220px;margin:0 auto;padding:20px 16px 60px}
+.notice{background:var(--primary-soft);color:var(--primary);border-radius:8px;padding:8px 14px;margin-bottom:16px;font-size:13px}
+.grid{display:grid;gap:16px}
+.g-assets{grid-template-columns:360px 1fr}
+.g-two{grid-template-columns:380px 1fr}
+@media(max-width:900px){.g-assets,.g-two{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card>h3{margin:0;padding:12px 16px;font-size:15px;border-bottom:1px solid var(--line)}
+.card-b{padding:16px}
+label.f{display:block;margin-bottom:12px}
+label.f>span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+.inp,select.inp,textarea.inp{width:100%;border:1px solid var(--line);background:var(--card);border-radius:7px;padding:7px 10px;outline:none}
+.inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+textarea.inp{resize:vertical;min-height:70px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:7px 16px;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn.p{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.p:hover{filter:brightness(1.08);color:#fff}
+.btn.d{background:var(--err);border-color:var(--err);color:#fff}
+.btn.sm{padding:3px 10px;font-size:12px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:18px;text-align:center;cursor:pointer;color:var(--sub);transition:.15s}
+.drop:hover,.drop.over{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumbs div{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.thumbs b{position:absolute;top:0;right:0;background:rgba(0,0,0,.55);color:#fff;width:18px;height:18px;line-height:18px;text-align:center;font-size:12px;cursor:pointer;border-radius:0 0 0 6px}
+.tip{font-size:12px;color:var(--sub);margin-top:6px}
+.tag{display:inline-block;padding:1px 9px;border-radius:5px;font-size:12px;margin:0 6px 6px 0;background:var(--primary-soft);color:var(--primary)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.err{background:var(--err-soft);color:var(--err)} .tag.gray{background:var(--code);color:var(--sub)}
+.waterfall{column-count:3;column-gap:16px}
+@media(max-width:1100px){.waterfall{column-count:2}} @media(max-width:600px){.waterfall{column-count:1}}
+.pcard{break-inside:avoid;margin-bottom:16px;overflow:hidden}
+.pimg{aspect-ratio:1/1;display:block;width:100%;object-fit:cover}
+.pimg.t2{aspect-ratio:4/5} .pimg.t3{aspect-ratio:1/1.1}
+.pinfo{padding:12px}
+.pinfo h4{margin:0 0 6px;font-size:15px}
+.ai-t{font-size:12px;color:var(--sub);margin:8px 0 3px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--card);padding:6px 12px;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--primary);color:#fff}
+.md{line-height:1.8;word-break:break-word;min-height:200px}
+.md table{border-collapse:collapse;margin:8px 0;width:100%;font-size:13px}
+.md th,.md td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.md th{background:var(--code)}
+.md ul{padding-left:20px;margin:6px 0}
+.md p{margin:6px 0}
+.md.typing>:last-child::after,.md.typing:empty::after{content:'▍';margin-left:2px;color:var(--primary);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.alert{padding:8px 12px;border-radius:7px;margin-bottom:12px;font-size:13px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)} .alert.err{background:var(--err-soft);color:var(--err)} .alert.ok{background:var(--ok-soft);color:var(--ok)}
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{background:var(--code);text-align:left;padding:8px 12px;font-weight:600}
+table.t td{padding:8px 12px;border-top:1px solid var(--line)}
+.sk{background:linear-gradient(90deg,var(--code) 25%,var(--line) 37%,var(--code) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:8px}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.log{background:var(--code);border-radius:8px;padding:10px 12px;font:12px/1.7 Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;margin-top:12px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gallery .g{border-radius:8px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:var(--card)}
+.gallery svg,.gallery img{display:block;width:100%;aspect-ratio:1/1}
+.gallery small{display:block;padding:6px 8px;color:var(--sub);font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:14px 16px}
+.kpi small{color:var(--sub)} .kpi b{display:block;font-size:26px;margin-top:2px}
+.charts{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+@media(max-width:900px){.charts{grid-template-columns:1fr}}
+.legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--sub);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.mask{position:fixed;inset:0;background:rgba(10,15,25,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.mask.on{display:flex}
+.modal{background:var(--card);border-radius:12px;max-width:620px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px}
+.modal h3{margin:0 0 10px}
+pre.tree{background:var(--code);border-radius:8px;padding:12px;font:13px/1.7 Menlo,Consolas,monospace;overflow:auto;margin:0 0 12px}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.15);border-radius:8px;padding:8px 16px;animation:fade .2s}
+.toast.ok{border-color:var(--ok);color:var(--ok)} .toast.err{border-color:var(--err);color:var(--err)} .toast.warn{border-color:var(--warn);color:var(--warn)}
+@keyframes fade{from{opacity:0;transform:translateY(-6px)}}
+.empty{text-align:center;color:var(--sub);padding:30px 0}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:rot .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes rot{to{transform:rotate(360deg)}}
+.foot{color:var(--sub);font-size:12px;text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="topbar-in">
+  <div class="brand"><div class="logo">✦</div>AI 出海营销工坊</div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="top-right"><span class="badge">原型 · 全部为模拟数据</span><button class="icon-btn" id="theme" title="切换明暗">◐</button></div>
+</div></div>
+<main id="view"></main>
+<div class="mask" id="mask"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ============ 模拟数据 ============ */
+const AUD = ['欧美年轻人','日本上班族','拉美家庭用户','东南亚学生'];
+const CAT = ['家居收纳','3C 配件','美妆个护','服饰箱包','户外运动'];
+const LANG = {en:'English',ja:'日本語',es:'Español'};
+const CH = {amazon:'Amazon',tiktok:'TikTok',instagram:'Instagram'};
+
+const products = [
+ {id:'p1',kind:'earbuds',color:'#2f3a52',name:'静音降噪无线耳机',audience:'欧美年轻人',category:'3C 配件',time:'2026-10-19 09:12',
+  ai:{visual_elements:['哑光黑色充电盒','圆角矩形','磨砂质感','入耳式双耳'],core_selling_points:['主动降噪','单次续航 8 小时','触控操作','IPX5 防水'],scene_suggestions:['清晨公园晨跑，阳光洒在身上','咖啡馆窗边办公，木桌与笔记本电脑','地铁通勤，戴耳机阅读']},
+  t:{en:{n:'Noise-Cancelling Wireless Earbuds',p:['Active noise cancelling','8-hour battery life','Touch controls','IPX5 sweat resistance']},
+     ja:{n:'ノイズキャンセリング ワイヤレスイヤホン',p:['アクティブノイズキャンセリング','最大8時間再生','タッチ操作','IPX5防水']},
+     es:{n:'Auriculares inalámbricos con cancelación de ruido',p:['Cancelación activa de ruido','8 horas de batería','Controles táctiles','Resistentes al sudor IPX5']}}},
+ {id:'p2',kind:'bottle',color:'#1f9d8a',name:'316 不锈钢保温杯',audience:'日本上班族',category:'户外运动',time:'2026-10-19 09:40',
+  ai:{visual_elements:['薄荷绿杯身','不锈钢杯盖','细长圆柱形','哑光喷涂'],core_selling_points:['12 小时保温保冷','316 食品级不锈钢','防漏杯盖','单手开合'],scene_suggestions:['办公室桌面，旁边放着笔记本','秋日登山步道，背包侧袋','清晨厨房台面，阳光透过窗户']},
+  t:{en:{n:'316 Stainless Steel Insulated Bottle',p:['12-hour hot & cold insulation','Food-grade 316 stainless steel','Leak-proof lid','One-hand opening']},
+     ja:{n:'316ステンレス 保温ボトル',p:['12時間保温・保冷','食品グレード316ステンレス','漏れにくいフタ','片手で開閉']},
+     es:{n:'Botella térmica de acero inoxidable 316',p:['12 horas de frío y calor','Acero inoxidable 316 apto alimentos','Tapa antiderrames','Apertura con una mano']}}},
+ {id:'p3',kind:'tote',color:'#c58a4a',name:'加厚帆布托特包',audience:'东南亚学生',category:'服饰箱包',time:'2026-10-19 10:05',
+  ai:{visual_elements:[],core_selling_points:[],scene_suggestions:[]},
+  t:null},
+ {id:'p4',kind:'box',color:'#7a8cc2',name:'桌面多格收纳盒',audience:'日本上班族',category:'家居收纳',time:'2026-10-19 10:31',
+  ai:{visual_elements:[],core_selling_points:[],scene_suggestions:[]},
+  t:null}
+];
+const AI_PRESET = {
+ tote:{visual_elements:['米色加厚帆布','双肩带提手','方形大容量','简约无印花'],core_selling_points:['大容量可装 15 寸电脑','加厚耐磨帆布','内置拉链口袋','可机洗'],scene_suggestions:['校园图书馆门口，抱着书本','周末市集，装满新鲜水果','海边木栈道，阳光明媚'],
+  t:{en:{n:'Heavy-Duty Canvas Tote Bag',p:['Fits a 15-inch laptop','Thick, durable canvas','Inner zip pocket','Machine washable']},ja:{n:'厚手キャンバス トートバッグ',p:['15インチPC対応の大容量','丈夫な厚手キャンバス','内ファスナーポケット','洗濯機OK']},es:{n:'Bolso tote de lona gruesa',p:['Cabe un portátil de 15"','Lona gruesa y resistente','Bolsillo interior con cremallera','Lavable a máquina']}}},
+ box:{visual_elements:['浅蓝灰色','多格分区','圆角方盒','哑光塑料'],core_selling_points:['6 格自由分区','叠放节省空间','防滑底垫','可拆卸隔板'],scene_suggestions:['整洁的书桌，台灯和绿植相伴','简约日式书房，木质书架','工作台一角，文具井然有序'],
+  t:{en:{n:'Desktop Multi-Compartment Organizer',p:['6 flexible compartments','Stackable to save space','Non-slip base','Removable dividers']},ja:{n:'デスク収納ボックス（仕切り付き）',p:['6つの仕切りで自由に整理','積み重ねて省スペース','滑り止め付き','仕切り取り外し可能']},es:{n:'Organizador de escritorio multicompartimento',p:['6 compartimentos flexibles','Apilable, ahorra espacio','Base antideslizante','Divisores extraíbles']}}}
+};
+const GENERIC_T = (name)=>({en:{n:name,p:['Premium quality','Easy to use','Great for daily life','Thoughtful design']},ja:{n:name,p:['高品質','使いやすい','毎日の暮らしに','考え抜かれたデザイン']},es:{n:name,p:['Calidad premium','Fácil de usar','Ideal para el día a día','Diseño cuidado']}});
+
+let copyHistory = [
+ {id:'c1',pid:'p1',lang:'en',ch:'amazon',time:'2026-10-19 11:02'},
+ {id:'c2',pid:'p1',lang:'ja',ch:'tiktok',time:'2026-10-19 11:15'},
+ {id:'c3',pid:'p2',lang:'es',ch:'instagram',time:'2026-10-19 11:28'}
+];
+const SCENE_PROMPT = {
+ 0:'A matte black wireless earbud case as the hero product, placed on a sunlit park bench at sunrise, soft golden-hour backlight with gentle rim light, rule of thirds composition, shallow depth of field with blurred green trees, 85mm lens, f/1.8, commercial product photography, photorealistic, high detail, no text, no watermark',
+ 1:'A matte black wireless earbud case on a wooden café table beside a laptop, large window with warm morning light, soft rim lighting, 45-degree angle, shallow depth of field, 85mm lens f/1.8, cozy lifestyle product photography, photorealistic, no text, no logo',
+ 2:'A matte black earbud case held loosely in a commuter hand on a subway, soft cool ambient light mixed with warm highlights, centered composition, shallow depth of field, 50mm lens, commercial lifestyle photography, photorealistic, no text, no watermark'
+};
+let gallery = [
+ {pid:'p1',scene:0,theme:'sunrise'},{pid:'p2',scene:0,theme:'office'},{pid:'p1',scene:1,theme:'cafe'},
+ {pid:'p3',scene:2,theme:'beach'},{pid:'p4',scene:0,theme:'study'},{pid:'p2',scene:1,theme:'hike'}
+];
+const STATS = {
+ prompt:[3200,4100,2800,5200,6100,4800,3900], comp:[2100,2900,1800,3600,4300,3300,2600],
+ success:128, failed:9,
+ byPurpose:[['vision','识图',24,41200],['copy','文案',58,96800],['prompt','提示词扩写',31,18400],['image','生图',24,0]]
+};
+
+/* ============ 工具 ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const find = id=>products.find(p=>p.id===id);
+const nowStr = ()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`};
+function toast(msg,type='ok'){const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;$('#toast').appendChild(el);setTimeout(()=>el.remove(),2400)}
+function openModal(html){$('#modal').innerHTML=html;$('#mask').classList.add('on')}
+function closeModal(){$('#mask').classList.remove('on')}
+$('#mask').addEventListener('click',e=>{if(e.target.id==='mask')closeModal()});
+const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+const analyzed = p=>p.ai.core_selling_points.length>0;
+
+/* 商品插画（用 SVG 模拟商品图） */
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=(n>>8&255)+amt,b=(n&255)+amt;const c=v=>Math.max(0,Math.min(255,v));return '#'+[c(r),c(g),c(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function productShape(kind,c){
+  const d=shade(c,-35),l=shade(c,45);
+  if(kind==='earbuds')return `<rect x="62" y="78" width="76" height="62" rx="22" fill="${c}"/><path d="M62 104h76" stroke="${d}" stroke-width="3"/><circle cx="100" cy="104" r="5" fill="${l}"/><ellipse cx="84" cy="64" rx="11" ry="15" fill="${l}"/><ellipse cx="116" cy="64" rx="11" ry="15" fill="${l}"/>`;
+  if(kind==='bottle')return `<rect x="78" y="46" width="44" height="18" rx="6" fill="${d}"/><rect x="70" y="62" width="60" height="100" rx="14" fill="${c}"/><rect x="78" y="76" width="8" height="70" rx="4" fill="${l}" opacity=".55"/>`;
+  if(kind==='tote')return `<path d="M72 84c0-34 56-34 56 0" fill="none" stroke="${d}" stroke-width="7" stroke-linecap="round"/><path d="M58 84h84l8 76H50z" fill="${c}"/><rect x="82" y="108" width="36" height="22" rx="4" fill="${l}" opacity=".6"/>`;
+  return `<path d="M54 96l46-22 46 22v44l-46 22-46-22z" fill="${c}"/><path d="M54 96l46 22 46-22" fill="none" stroke="${l}" stroke-width="3"/><path d="M100 118v44" stroke="${d}" stroke-width="3"/>`;
+}
+function productImg(p,cls=''){
+  if(p.img)return `<img class="pimg ${cls}" src="${p.img}" alt="${esc(p.name)}">`;
+  const c=p.color;
+  return `<svg class="pimg ${cls}" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="bg${p.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${shade(c,95)}"/><stop offset="1" stop-color="${shade(c,60)}"/></linearGradient></defs><rect width="200" height="200" fill="url(#bg${p.id})"/><ellipse cx="100" cy="166" rx="48" ry="7" fill="rgba(0,0,0,.14)"/>${productShape(p.kind,c)}</svg>`;
+}
+const THEMES={
+ sunrise:['#ffd9a8','#8fc4a1','☀'],office:['#cfe3f6','#e9d9c4','▤'],cafe:['#f0dcc4','#b88c62','☕'],
+ beach:['#bfe6f2','#f3dfb3','≈'],study:['#e5e8f3','#c9b79c','▥'],hike:['#cfe5c9','#7da679','▲']
+};
+function sceneArt(item){
+  const p=find(item.pid)||products[0],t=THEMES[item.theme]||THEMES.sunrise;
+  const u='s'+Math.random().toString(36).slice(2,8);
+  return `<svg viewBox="0 0 200 200"><defs><linearGradient id="${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t[0]}"/><stop offset="1" stop-color="${shade(t[0],-20)}"/></linearGradient></defs><rect width="200" height="200" fill="url(#${u})"/><circle cx="150" cy="48" r="22" fill="#fff" opacity=".55"/><text x="150" y="57" text-anchor="middle" font-size="24" opacity=".7">${t[2]}</text><rect y="132" width="200" height="68" fill="${t[1]}"/><rect y="128" width="200" height="8" fill="${shade(t[1],-18)}" opacity=".5"/><ellipse cx="100" cy="150" rx="46" ry="6" fill="rgba(0,0,0,.18)"/><g transform="translate(25 6) scale(.75)">${productShape(p.kind,p.color)}</g></svg>`;
+}
+
+/* ============ 路由 / 标签页 ============ */
+const TABS=[['assets','资产中心'],['copy','文案工坊'],['scene','场景生图'],['stats','运营看板']];
+let tab=localStorage.getItem('tab')||'assets';
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(([k,v])=>`<button class="tab ${k===tab?'on':''}" data-k="${k}">${v}</button>`).join('');
+}
+$('#tabs').addEventListener('click',e=>{const k=e.target.dataset.k;if(k){stopAll();tab=k;try{localStorage.setItem('tab',k)}catch(_){}go()}});
+function go(){renderTabs();({assets:viewAssets,copy:viewCopy,scene:viewScene,stats:viewStats})[tab]()}
+function stopAll(){stopTyping();stopPoll()}
+$('#theme').onclick=()=>{const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#12161d';r.dataset.theme=dark?'light':'dark'};
+
+/* ============ 资产中心 ============ */
+let pending=[];
+function viewAssets(){
+  $('#view').innerHTML=`
+  <div class="notice">对应作业 3、4：商品多图上传（格式与大小校验）、瀑布流列表、AI 一键识别。上传的图片只在本页预览，不会离开你的电脑。</div>
+  <div class="grid g-assets">
+   <div class="card"><h3>上传商品素材</h3><div class="card-b">
+    <label class="f"><span>商品名称 *</span><input class="inp" id="u-name" maxlength="60" placeholder="例如：便携榨汁杯"></label>
+    <label class="f"><span>目标受众</span><select class="inp" id="u-aud"><option value="">请选择</option>${AUD.map(a=>`<option>${a}</option>`).join('')}</select></label>
+    <label class="f"><span>商品品类</span><select class="inp" id="u-cat"><option value="">请选择</option>${CAT.map(a=>`<option>${a}</option>`).join('')}</select></label>
+    <div class="f"><span style="display:block;font-size:13px;color:var(--sub);margin-bottom:4px">商品图片 *</span>
+     <div class="drop" id="drop">将图片拖到此处，或 <b>点击选择</b></div>
+     <input type="file" id="file" accept="image/*" multiple hidden>
+     <div class="tip">支持 JPG / PNG / WebP，单张不超过 5MB，最多 5 张</div>
+     <div class="thumbs" id="thumbs"></div></div>
+    <button class="btn p" id="u-submit">上传并保存</button>
+   </div></div>
+   <div><div class="row" style="margin-bottom:12px"><b>商品列表</b><span class="tag gray">${products.length} 个商品</span></div>
+    <div class="waterfall" id="wf"></div></div>
+  </div>`;
+  pending=[];renderThumbs();renderProducts();
+  const drop=$('#drop'),file=$('#file');
+  drop.onclick=()=>file.click();
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+  drop.ondragleave=()=>drop.classList.remove('over');
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');addFiles(e.dataTransfer.files)};
+  file.onchange=()=>{addFiles(file.files);file.value=''};
+  $('#u-submit').onclick=submitProduct;
+}
+function addFiles(list){
+  for(const f of list){
+    if(!['image/jpeg','image/png','image/webp'].includes(f.type)){toast(`${f.name}：仅支持 JPG / PNG / WebP`,'err');continue}
+    if(f.size>5*1024*1024){toast(`${f.name} 超过 5MB`,'err');continue}
+    if(pending.length>=5){toast('最多上传 5 张图片','warn');break}
+    pending.push({name:f.name,url:URL.createObjectURL(f)});
+  }
+  renderThumbs();
+}
+function renderThumbs(){
+  $('#thumbs').innerHTML=pending.map((f,i)=>`<div><img src="${f.url}" alt=""><b data-i="${i}">×</b></div>`).join('');
+  $('#thumbs').onclick=e=>{const i=e.target.dataset.i;if(i!==undefined){pending.splice(+i,1);renderThumbs()}};
+}
+function submitProduct(){
+  const name=$('#u-name').value.trim();
+  if(!name)return toast('请填写商品名称','warn');
+  if(!pending.length)return toast('请至少选择一张图片','warn');
+  products.unshift({id:'p'+Date.now(),kind:'box',color:'#7a8cc2',img:pending[0].url,name,audience:$('#u-aud').value,category:$('#u-cat').value,time:nowStr(),ai:{visual_elements:[],core_selling_points:[],scene_suggestions:[]},t:null});
+  toast('上传成功');viewAssets();
+}
+function renderProducts(){
+  const aiRows=p=>analyzed(p)?`<div class="ai-t">外观特征</div>${p.ai.visual_elements.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
+    <div class="ai-t">核心卖点</div>${p.ai.core_selling_points.map(t=>`<span class="tag ok">${esc(t)}</span>`).join('')}
+    <div class="ai-t">场景建议</div>${p.ai.scene_suggestions.map(t=>`<span class="tag warn">${esc(t)}</span>`).join('')}`:'';
+  $('#wf').innerHTML=products.map((p,i)=>`<div class="card pcard">${productImg(p,i%3===1?'t2':i%3===2?'t3':'')}
+    <div class="pinfo"><h4>${esc(p.name)}</h4>
+     ${p.category?`<span class="tag">${p.category}</span>`:''}${p.audience?`<span class="tag ok">${p.audience}</span>`:''}
+     <div class="tip" style="margin:0 0 8px">${p.time}</div>
+     <div class="row"><button class="btn sm p" data-act="ai" data-id="${p.id}">${analyzed(p)?'重新识别':'AI 一键识别'}</button><button class="btn sm" data-act="zip" data-id="${p.id}">导出营销包</button></div>
+     <div id="ai-${p.id}">${aiRows(p)}</div></div></div>`).join('');
+  $('#wf').onclick=e=>{const b=e.target.closest('button');if(!b)return;const p=find(b.dataset.id);b.dataset.act==='ai'?runAnalyze(p,b):showZip(p)};
+}
+async function runAnalyze(p,btn){
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>识别中…';
+  await sleep(1800);
+  const preset=AI_PRESET[p.kind]||AI_PRESET.box;
+  p.ai={visual_elements:preset.visual_elements,core_selling_points:preset.core_selling_points,scene_suggestions:preset.scene_suggestions};
+  if(!p.t)p.t=preset.t;
+  toast('识别完成');renderProducts();
+}
+
+/* 营销包弹窗（模拟 ZIP 结构） */
+function showZip(p){
+  const imgs=gallery.filter(g=>g.pid===p.id),copies=copyHistory.filter(c=>c.pid===p.id);
+  if(!imgs.length&&!copies.length)return toast('该商品还没有可导出的素材，请先生成文案或场景图','warn');
+  const root=p.name+'-营销包';
+  const lines=[`${root}.zip`,`└─ ${root}/`,`   ├─ images/`,...imgs.map((g,i)=>`   │  ├─ scene-${i+1}.png`),`   ├─ copy/`,...copies.map(c=>`   │  ├─ ${c.ch}-${c.lang}-${c.id.slice(1)}.txt`),`   └─ README.txt`];
+  openModal(`<h3>导出营销包（原型演示）</h3><p style="color:var(--sub);margin-top:0">真实系统会用 jszip 在浏览器里把图片与文案打包。这里展示打包后的结构，并提供一份清单下载。</p>
+   <pre class="tree">${esc(lines.join('\n'))}</pre>
+   <div class="row" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">关闭</button><button class="btn p" id="dl">下载清单（.txt）</button></div>`);
+  $('#dl').onclick=()=>{const b=new Blob([lines.join('\n')+`\n\n商品：${p.name}\n导出时间：${nowStr()}\n`],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=root+'-清单.txt';a.click();toast('已开始下载')};
+}
+
+/* ============ 文案工坊 ============ */
+const BANNED=[/最(好|佳|强|低|高|大|优|先进)/g,/第一/g,/顶级|极致|史上|万能/g,/100%|百分之百/g,/根治|治愈|包治|永久/g,/\b(best in the world|guaranteed|miracle|risk[- ]free)\b/gi];
+const findBad=s=>{const h=new Set();BANNED.forEach(r=>{r.lastIndex=0;(s.match(r)||[]).forEach(w=>h.add(w))});return[...h]};
+
+function copyText(p,lang,ch){
+  const t=(p.t||GENERIC_T(p.name))[lang],n=t.n,[a,b,c,d]=t.p;
+  const T={
+  en:{
+   amazon:`**Title**\n${n} – ${a} & ${b} for Everyday Life\n\n**Bullet Points**\n- **${a.toUpperCase()}** – Engineered to deliver a dependable everyday experience, whether at home, at work or on the go.\n- **${b.toUpperCase()}** – Designed around real daily routines so you can enjoy it from the very first use.\n- **${c.toUpperCase()}** – A thoughtful detail that makes life a little easier.\n- **${d.toUpperCase()}** – Built with care for long-lasting, worry-free use.\n- **GIFT-READY** – Arrives in clean packaging, a practical pick for friends and family.\n\n**Description**\nMeet the ${n}. It brings together ${a.toLowerCase()}, ${b.toLowerCase()} and ${c.toLowerCase()} in one clean, modern design. Made for people who want products that simply work, it fits naturally into busy days and relaxed weekends alike.\n\n**Search Keywords**\n${n.toLowerCase()}, ${a.toLowerCase()}, daily essentials, gift idea, lifestyle`,
+   tiktok:`**Video script · 20s**\n\n| Time | Visual | Voice-over | On-screen text |\n|---|---|---|---|\n| 0-3s | Close-up: hand grabs the ${n} | "Wait — this changed my daily routine." | ${a}! |\n| 3-8s | Product in use, quick cuts | "${a}. Plus ${b.toLowerCase()}." | ${b} |\n| 8-14s | Lifestyle montage | "${c}, and ${d.toLowerCase()} — all day." | ${c} |\n| 14-20s | Product on table, smile | "Link in bio. You'll thank me later." | Shop now ↓ |\n\n#tiktokmademebuyit #dailyessentials #musthave`,
+   instagram:`Small upgrades, big difference ✨\n\nMeet the ${n} — ${a.toLowerCase()}, ${b.toLowerCase()}, and a design that just fits your day 🌿\n\nHow do you make your everyday a little easier? Tell us below 👇\n\nTap the link in bio to shop 🛍️\n\n#${n.replace(/[^A-Za-z]/g,'')} #dailyessentials #lifestyle #giftideas #musthave #smallbusiness #aesthetic #everydaycarry #newarrival #shopnow`},
+  ja:{
+   amazon:`**タイトル**\n${n}｜${a}・${b}で毎日が快適に\n\n**商品の特徴**\n- **${a}**：毎日の暮らしに寄り添う、頼れる使い心地です。\n- **${b}**：普段の生活シーンを考えて設計しました。\n- **${c}**：ちょっとした工夫で、使うたびに便利さを実感できます。\n- **${d}**：長く安心してお使いいただける品質を目指しました。\n- **ギフトにも**：すっきりしたパッケージで、大切な方への贈り物にもおすすめです。\n\n**商品説明**\n${n}は、${a}、${b}、${c}を一つにまとめたシンプルで洗練されたデザインです。忙しい平日も、ゆったりした休日も、自然に馴染みます。`,
+   tiktok:`**動画台本（約20秒）**\n\n| 時間 | 映像 | ナレーション | テロップ |\n|---|---|---|---|\n| 0-3秒 | ${n}を手に取るアップ | 「これ、毎日の習慣が変わりました」 | ${a} |\n| 3-8秒 | 使用シーン | 「${a}、そして${b}」 | ${b} |\n| 8-14秒 | 生活シーンのカット | 「${c}。${d}」 | ${c} |\n| 14-20秒 | 机の上に置いて笑顔 | 「プロフィールのリンクからどうぞ」 | 今すぐチェック ↓ |\n\n#おすすめ #暮らし #毎日使える`,
+   instagram:`毎日を、ちょっとだけ心地よく ✨\n\n${n}｜${a}、${b}。暮らしにすっと馴染むデザインです 🌿\n\nあなたの「ちょっと便利」はどんなこと？ コメントで教えてください 👇\n\nプロフィールのリンクからチェックしてね 🛍️\n\n#暮らしを楽しむ #毎日使える #ギフト #おすすめ #新商品 #シンプルライフ #丁寧な暮らし #便利グッズ #日常 #お気に入り`},
+  es:{
+   amazon:`**Título**\n${n} – ${a} y ${b} para tu día a día\n\n**Características**\n- **${a.toUpperCase()}** – Pensado para acompañarte en casa, en el trabajo o de viaje.\n- **${b.toUpperCase()}** – Diseñado según tus rutinas reales para que lo disfrutes desde el primer uso.\n- **${c.toUpperCase()}** – Un detalle que te hace la vida más fácil.\n- **${d.toUpperCase()}** – Fabricado con cuidado para un uso duradero y sin preocupaciones.\n- **IDEAL PARA REGALAR** – Llega en un empaque limpio, un regalo práctico para tu familia y amigos.\n\n**Descripción**\nConoce ${n}. Reúne ${a.toLowerCase()}, ${b.toLowerCase()} y ${c.toLowerCase()} en un diseño moderno y sencillo. Se adapta tanto a días ocupados como a fines de semana tranquilos.`,
+   tiktok:`**Guion de video · 20 s**\n\n| Tiempo | Imagen | Locución | Texto en pantalla |\n|---|---|---|---|\n| 0-3 s | Primer plano: la mano toma ${n} | "Esto me cambió la rutina." | ${a} |\n| 3-8 s | Uso del producto | "${a}. Y además ${b.toLowerCase()}." | ${b} |\n| 8-14 s | Escenas del día a día | "${c}, y ${d.toLowerCase()}." | ${c} |\n| 14-20 s | Producto sobre la mesa | "Link en la bio." | Cómpralo ↓ |\n\n#parati #productosutiles #favoritos`,
+   instagram:`Pequeños cambios, gran diferencia ✨\n\nConoce ${n}: ${a.toLowerCase()}, ${b.toLowerCase()} y un diseño que encaja con tu día 🌿\n\n¿Cómo haces tu día a día más fácil? Cuéntanos 👇\n\nCompra en el link de la bio 🛍️\n\n#productosutiles #favoritos #regalo #novedad #estilodevida #hogar #diaadia #recomendado #compras #tendencia`}
+  };
+  return T[lang][ch];
+}
+function md(src){
+  const lines=src.split('\n'),out=[];let i=0;
+  const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  while(i<lines.length){
+    const l=lines[i];
+    if(l.startsWith('|')){const rows=[];while(i<lines.length&&lines[i].startsWith('|')){rows.push(lines[i]);i++}
+      const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(s=>s.trim());
+      const head=cells(rows[0]),body=rows.slice(2).map(cells);
+      out.push(`<table><tr>${head.map(h=>`<th>${inl(h)}</th>`).join('')}</tr>${body.map(r=>`<tr>${r.map(c=>`<td>${inl(c)}</td>`).join('')}</tr>`).join('')}</table>`);continue}
+    if(l.startsWith('- ')){const li=[];while(i<lines.length&&lines[i].startsWith('- ')){li.push(`<li>${inl(lines[i].slice(2))}</li>`);i++}out.push(`<ul>${li.join('')}</ul>`);continue}
+    if(l.trim()===''){i++;continue}
+    out.push(`<p>${inl(l)}</p>`);i++;
+  }
+  return out.join('');
+}
+let typer=null;
+function stopTyping(){clearInterval(typer);typer=null}
+const cf={pid:'p1',lang:'en',ch:'amazon',extra:''};
+function viewCopy(){
+  const ready=products.filter(analyzed);
+  if(!ready.find(p=>p.id===cf.pid))cf.pid=ready[0]?.id||'';
+  $('#view').innerHTML=`
+  <div class="notice">对应作业 5、6：按语言与渠道生成文案，敏感词拦截，SSE 打字机式流式输出，可随时“停止生成”。</div>
+  <div class="grid g-two">
+   <div class="card"><h3>生成设置</h3><div class="card-b">
+    <label class="f"><span>商品（仅显示已 AI 识别的）</span><select class="inp" id="c-p">${ready.length?ready.map(p=>`<option value="${p.id}" ${p.id===cf.pid?'selected':''}>${esc(p.name)}</option>`).join(''):'<option value="">暂无，请先去资产中心识别</option>'}</select></label>
+    <div class="f"><span style="display:block;font-size:13px;color:var(--sub);margin-bottom:4px">目标语言</span><div class="seg" id="c-l">${Object.entries(LANG).map(([k,v])=>`<button data-v="${k}" class="${k===cf.lang?'on':''}">${v}</button>`).join('')}</div></div>
+    <div class="f"><span style="display:block;font-size:13px;color:var(--sub);margin-bottom:4px">发布渠道</span><div class="seg" id="c-c">${Object.entries(CH).map(([k,v])=>`<button data-v="${k}" class="${k===cf.ch?'on':''}">${v}</button>`).join('')}</div></div>
+    <label class="f"><span>补充要求（可试试输入“全球最好”）</span><textarea class="inp" id="c-x" placeholder="例如：强调适合送礼">${esc(cf.extra)}</textarea></label>
+    <button class="btn p" id="c-go">生成文案</button>
+   </div></div>
+   <div class="card"><h3>生成结果 <span id="c-st" class="tag gray" style="margin-left:8px;display:none"></span></h3><div class="card-b">
+    <div id="c-alert"></div><div class="md" id="c-out"><span style="color:var(--sub)">这里实时显示生成的文案</span></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>历史文案</h3><div id="hist"></div></div>`;
+  $('#c-p').onchange=e=>cf.pid=e.target.value;
+  $('#c-x').oninput=e=>cf.extra=e.target.value;
+  $('#c-l').onclick=e=>{if(e.target.dataset.v){cf.lang=e.target.dataset.v;[...$('#c-l').children].forEach(b=>b.classList.toggle('on',b.dataset.v===cf.lang))}};
+  $('#c-c').onclick=e=>{if(e.target.dataset.v){cf.ch=e.target.dataset.v;[...$('#c-c').children].forEach(b=>b.classList.toggle('on',b.dataset.v===cf.ch))}};
+  $('#c-go').onclick=startCopy;renderHist();
+}
+function startCopy(){
+  const btn=$('#c-go');
+  if(btn.dataset.run==='1'){stopTyping();endCopy(false);return}
+  const p=find(cf.pid);
+  if(!p)return toast('请先选择商品','warn');
+  const bad=findBad(cf.extra);
+  if(bad.length){$('#c-alert').innerHTML=`<div class="alert err">补充要求包含敏感或极端营销词：${bad.join('、')}（已被合规中间件拦截，请求未发出）</div>`;return}
+  $('#c-alert').innerHTML='';
+  const full=copyText(p,cf.lang,cf.ch),out=$('#c-out'),st=$('#c-st');
+  btn.dataset.run='1';btn.className='btn d';btn.textContent='停止生成';
+  st.style.display='';st.textContent='生成中…';out.className='md typing';out.innerHTML='';
+  let n=0;
+  typer=setInterval(()=>{
+    n+=2+Math.floor(Math.random()*3);
+    out.innerHTML=md(full.slice(0,n));
+    if(n>=full.length){stopTyping();out.innerHTML=md(full);endCopy(true,p)}
+  },30);
+}
+function endCopy(done,p){
+  const btn=$('#c-go'),st=$('#c-st'),out=$('#c-out');if(!btn)return;
+  btn.dataset.run='0';btn.className='btn p';btn.textContent='生成文案';out.classList.remove('typing');
+  if(done){st.textContent='已完成并保存';copyHistory.unshift({id:'c'+Date.now(),pid:p.id,lang:cf.lang,ch:cf.ch,time:nowStr()});renderHist();toast('文案已保存')}
+  else{st.textContent='已停止（未保存）';toast('已停止生成','warn')}
+}
+function renderHist(){
+  const el=$('#hist');
+  el.innerHTML=copyHistory.length?`<table class="t"><tr><th>商品</th><th>语言</th><th>渠道</th><th>生成时间</th><th>操作</th></tr>${copyHistory.map(c=>`<tr><td>${esc(find(c.pid)?.name||'')}</td><td>${LANG[c.lang]}</td><td>${CH[c.ch]}</td><td>${c.time}</td><td><button class="btn sm" data-a="v" data-id="${c.id}">查看</button> <button class="btn sm" data-a="c" data-id="${c.id}">复制</button> <button class="btn sm" data-a="d" data-id="${c.id}">删除</button></td></tr>`).join('')}</table>`:'<div class="empty">暂无文案</div>';
+  el.onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=copyHistory.find(x=>x.id===b.dataset.id);
+    if(b.dataset.a==='d'){copyHistory=copyHistory.filter(x=>x!==c);renderHist();toast('已删除')}
+    else{const txt=copyText(find(c.pid),c.lang,c.ch);
+      if(b.dataset.a==='v')openModal(`<h3>${esc(find(c.pid).name)} · ${LANG[c.lang]} · ${CH[c.ch]}</h3><div class="md" style="min-height:0">${md(txt)}</div><div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" onclick="closeModal()">关闭</button></div>`);
+      else{(navigator.clipboard?navigator.clipboard.writeText(txt.replace(/\*\*/g,'')):Promise.reject()).then(()=>toast('已复制到剪贴板')).catch(()=>toast('当前环境无法复制','warn'))}}};
+}
+
+/* ============ 场景生图 ============ */
+let poller=null,pollN=0;
+function stopPoll(){clearInterval(poller);poller=null}
+const sf={pid:'p1',scene:0};
+function viewScene(){
+  const ready=products.filter(analyzed);
+  if(!ready.find(p=>p.id===sf.pid)){sf.pid=ready[0]?.id||'';sf.scene=0}
+  const p=find(sf.pid);
+  $('#view').innerHTML=`
+  <div class="notice">对应作业 7：LLM 扩写英文生图提示词 → 下发异步任务 → 骨架屏占位 → 每 3 秒轮询 → 渲染场景主图。生成的画面为示意插画。</div>
+  <div class="grid g-two">
+   <div class="card"><h3>场景图设置</h3><div class="card-b">
+    <label class="f"><span>商品（仅显示已 AI 识别的）</span><select class="inp" id="s-p">${ready.length?ready.map(x=>`<option value="${x.id}" ${x.id===sf.pid?'selected':''}>${esc(x.name)}</option>`).join(''):'<option value="">暂无，请先去资产中心识别</option>'}</select></label>
+    <div class="f"><span style="display:block;font-size:13px;color:var(--sub);margin-bottom:6px">场景建议（来自 AI 识别结果）</span>
+     ${p?p.ai.scene_suggestions.map((s,i)=>`<label style="display:flex;gap:8px;margin-bottom:6px;cursor:pointer"><input type="radio" name="sc" value="${i}" ${i===sf.scene?'checked':''}><span>${esc(s)}</span></label>`).join(''):''}</div>
+    <button class="btn p" id="s-go">生成场景主图</button>
+   </div></div>
+   <div class="card"><h3>生成结果</h3><div class="card-b"><div id="s-out"><div class="empty">选择商品与场景后点击生成</div></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>已生成场景图</h3><div class="card-b"><div class="gallery" id="gal"></div></div></div>`;
+  $('#s-p').onchange=e=>{sf.pid=e.target.value;sf.scene=0;viewScene()};
+  document.querySelectorAll('input[name=sc]').forEach(r=>r.onchange=()=>sf.scene=+r.value);
+  $('#s-go').onclick=startScene;renderGallery();
+}
+function renderGallery(){
+  $('#gal').innerHTML=gallery.map(g=>`<div class="g">${sceneArt(g)}<small>${esc(find(g.pid)?.name||'')}</small></div>`).join('');
+}
+function startScene(){
+  const p=find(sf.pid);if(!p)return toast('请先选择商品','warn');
+  const out=$('#s-out'),btn=$('#s-go');
+  const prompt=SCENE_PROMPT[sf.scene%3].replace(/matte black wireless earbud case|matte black earbud case/,()=>p.t?p.t.en.n.toLowerCase():'product');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>生成中…';
+  out.innerHTML=`<div class="sk" style="height:300px"></div><div class="tip" id="s-info" style="margin-top:10px">① 正在用 LLM 扩写英文提示词…</div><div class="log" id="s-log"></div>`;
+  setTimeout(()=>{
+    $('#s-log').textContent='[image-prompt] 场景：'+p.ai.scene_suggestions[sf.scene]+'\n[image-prompt] 扩写后的提示词：\n'+prompt;
+    $('#s-info').textContent='② 已下发异步任务 task_id=wanx-7f3a91…，每 3 秒轮询一次';
+    pollN=0;stopPoll();
+    poller=setInterval(()=>{
+      pollN++;
+      if(pollN<3){$('#s-info').textContent=`② 第 ${pollN} 次轮询：任务 ${pollN===1?'PENDING':'RUNNING'}…`;return}
+      stopPoll();
+      const themes=Object.keys(THEMES),item={pid:p.id,scene:sf.scene,theme:themes[(Math.random()*themes.length)|0]};
+      gallery.unshift(item);
+      out.innerHTML=`<div style="max-width:420px;margin:0 auto;border-radius:10px;overflow:hidden;border:1px solid var(--line)">${sceneArt(item)}</div><div class="alert ok" style="margin-top:12px">第 ${pollN} 次轮询：任务 SUCCEEDED，图片已下载到本地并写入数据库。</div><details open><summary style="cursor:pointer">查看 AI 扩写的英文提示词</summary><div class="log">${esc(prompt)}</div></details>`;
+      btn.disabled=false;btn.textContent='生成场景主图';renderGallery();toast('场景图生成完成');
+    },3000);
+  },900);
+}
+
+/* ============ 运营看板（SVG 图表） ============ */
+function viewStats(){
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(Date.now()-(6-i)*864e5);return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`});
+  const total=STATS.prompt.reduce((a,b)=>a+b,0)+STATS.comp.reduce((a,b)=>a+b,0);
+  const calls=STATS.success+STATS.failed,rate=(STATS.success/calls*100).toFixed(1);
+  $('#view').innerHTML=`
+  <div class="notice">对应作业 8：Token 埋点统计 + ECharts 看板（此处用 SVG 模拟折线图与饼图）。<b>当前统计均为演示数据，非真实调用。</b></div>
+  <div class="kpis">
+   <div class="card kpi"><small>近 7 天 Token 消耗</small><b>${total.toLocaleString()}</b></div>
+   <div class="card kpi"><small>API 调用次数</small><b>${calls}</b></div>
+   <div class="card kpi"><small>成功率</small><b>${rate}%</b></div>
+   <div class="card kpi"><small>平均耗时</small><b>3.2s</b></div>
+  </div>
+  <div class="charts">
+   <div class="card"><h3>每日 Token 消耗走势</h3><div class="card-b">${lineChart(days,[['Prompt Tokens','var(--primary)',STATS.prompt],['Completion Tokens','var(--warn)',STATS.comp]])}
+    <div class="legend"><span><i style="background:var(--primary)"></i>Prompt Tokens</span><span><i style="background:var(--warn)"></i>Completion Tokens</span></div></div></div>
+   <div class="card"><h3>API 调用成功率</h3><div class="card-b">${donut(STATS.success,STATS.failed,rate)}
+    <div class="legend"><span><i style="background:var(--ok)"></i>成功 ${STATS.success}</span><span><i style="background:var(--err)"></i>失败 ${STATS.failed}</span></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>各功能消耗明细</h3><table class="t"><tr><th>功能</th><th>调用次数</th><th>Token 总量</th><th>说明</th></tr>
+   ${STATS.byPurpose.map(r=>`<tr><td>${r[1]} <span class="tag gray">${r[0]}</span></td><td>${r[2]}</td><td>${r[3].toLocaleString()}</td><td style="color:var(--sub)">${r[0]==='image'?'生图按张计费，不计文本 Token，仅计入次数与成功率':'由 llmClient 统一埋点'}</td></tr>`).join('')}</table></div>`;
+}
+function lineChart(labels,series){
+  const W=560,H=260,L=48,R=16,T=14,B=30,max=Math.ceil(Math.max(...series.flatMap(s=>s[2]))/2000)*2000;
+  const x=i=>L+(W-L-R)*i/(labels.length-1),y=v=>T+(H-T-B)*(1-v/max);
+  let g='';
+  for(let k=0;k<=4;k++){const v=max*k/4,yy=y(v);g+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${L-6}" y="${yy+4}" text-anchor="end" font-size="11" fill="var(--sub)">${v>=1000?(v/1000)+'k':v}</text>`}
+  labels.forEach((l,i)=>g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--sub)">${l}</text>`);
+  series.forEach(([n,c,d])=>{
+    g+=`<polyline fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" points="${d.map((v,i)=>x(i)+','+y(v)).join(' ')}"/>`;
+    d.forEach((v,i)=>g+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--card)" stroke="${c}" stroke-width="2"><title>${labels[i]} ${n}：${v.toLocaleString()}</title></circle>`);
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${g}</svg>`;
+}
+function donut(a,b,rate){
+  const r=70,C=2*Math.PI*r,fa=C*a/(a+b);
+  return `<svg viewBox="0 0 220 220" style="width:100%;max-width:260px;display:block;margin:0 auto"><g transform="rotate(-90 110 110)"><circle cx="110" cy="110" r="${r}" fill="none" stroke="var(--err)" stroke-width="28"><title>失败 ${b} 次</title></circle><circle cx="110" cy="110" r="${r}" fill="none" stroke="var(--ok)" stroke-width="28" stroke-dasharray="${fa} ${C}"><title>成功 ${a} 次</title></circle></g><text x="110" y="106" text-anchor="middle" font-size="26" font-weight="700" fill="var(--text)">${rate}%</text><text x="110" y="128" text-anchor="middle" font-size="12" fill="var(--sub)">成功率</text></svg>`;
+}
+
+go();
+</script>
+</body>
+</html>
