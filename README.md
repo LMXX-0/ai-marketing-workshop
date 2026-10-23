@@ -24,7 +24,11 @@ ai-marketing-workshop/
 │  ├─ uploads/            # 上传与生成的图片（不进 Git）
 │  ├─ .env                # 密钥（不进 Git）
 │  └─ .env.example
-├─ docs/                    # 需求规格、API 规划与作业文档
+├─ docs/                    # 项目文档与提交物
+│  ├─ 需求与规划/            # 需求规格书、API 规划、业务流程图、痛点调研
+│  ├─ 作业文档/              # markdown/ 课程原始稿；word/ 提交版
+│  ├─ 原型/                  # 出海营销工坊原型 HTML
+│  └─ 提交物截图/            # 各次作业提交截图
 ├─ .gitignore
 └─ README.md
 ```
